@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Cotizador — COTA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-mark">
+    <span class="mark-line"></span>
+    <span class="mark-text">COTA</span>
+  </div>
+  <div class="topbar-title">Estimación preliminar de proyecto</div>
+  <div class="topbar-status" id="estadoConexion">cargando catálogo…</div>
+</header>
+
+<main class="layout">
+
+  <form id="formCotizador" class="panel-form">
+
+    <!-- 1. DATOS GENERALES -->
+    <section class="card" data-section="1">
+      <h2><span class="card-num">01</span> Datos generales</h2>
+      <div class="grid-2">
+        <label>Cliente
+          <input type="text" id="clienteNombre" placeholder="Nombre del cliente">
+        </label>
+        <label>Proyecto
+          <input type="text" id="nombreProyecto" placeholder="Ej. Clóset recámara principal">
+        </label>
+        <label>Tipo de mueble
+          <select id="tipoMueble">
+            <option value="">Selecciona…</option>
+          </select>
+        </label>
+        <label>Estado del proyecto
+          <select id="estadoProyecto">
+            <option>Idea inicial</option>
+            <option>Cliente interesado</option>
+            <option>Por medir</option>
+            <option>Medidas proporcionadas</option>
+            <option>Diseño avanzado</option>
+            <option>Listo para cotizar</option>
+          </select>
+        </label>
+      </div>
+      <label class="checkbox-line">
+        <input type="checkbox" id="imagenSimple">
+        La imagen de referencia es simple (no requiere diseño especial)
+      </label>
+      <label class="checkbox-line">
+        <input type="checkbox" id="ubicacionConfirmada">
+        Ubicación y acceso confirmados (visitados o descritos con detalle)
+      </label>
+    </section>
+
+    <!-- 2. MEDIDAS -->
+    <section class="card" data-section="2">
+      <h2><span class="card-num">02</span> Medidas</h2>
+      <div class="radio-row">
+        <label><input type="radio" name="tipoMedida" value="exacta" checked> Exacta</label>
+        <label><input type="radio" name="tipoMedida" value="aproximada"> Aproximada</label>
+        <label><input type="radio" name="tipoMedida" value="desconocida"> Desconocida</label>
+      </div>
+      <p class="hint" id="hintMedida"></p>
+      <div class="grid-3">
+        <label>Ancho (cm)
+          <input type="number" id="ancho" min="0" step="1">
+        </label>
+        <label>Alto (cm)
+          <input type="number" id="alto" min="0" step="1">
+        </label>
+        <label>Profundidad (cm)
+          <input type="number" id="profundidad" min="0" step="1">
+        </label>
+      </div>
+    </section>
+
+    <!-- 3. MATERIAL PRINCIPAL -->
+    <section class="card" data-section="3">
+      <h2><span class="card-num">03</span> Material principal</h2>
+      <div class="grid-2">
+        <label>Material (catálogo)
+          <select id="materialCatalogo">
+            <option value="">Selecciona…</option>
+          </select>
+        </label>
+        <label>Acabado
+          <input type="text" id="acabado" placeholder="Ej. Mate / Brillante / Textura">
+        </label>
+        <label># de hojas estimadas
+          <input type="number" id="numHojas" min="0" step="0.25" value="1">
+        </label>
+        <label>Precio por hoja (MXN)
+          <input type="number" id="precioHoja" min="0" step="1">
+        </label>
+        <label>Merma (%)
+          <input type="number" id="mermaPct" min="0" step="0.5">
+        </label>
+      </div>
+    </section>
+
+    <!-- 4. COMPONENTES ADICIONALES -->
+    <section class="card" data-section="4">
+      <h2><span class="card-num">04</span> Herrajes, accesorios y consumibles</h2>
+      <div id="listaComponentes" class="repeat-list"></div>
+      <button type="button" class="btn-add" id="btnAddComponente">+ Agregar componente</button>
+    </section>
+
+    <!-- 5. SERVICIOS EXTERNOS -->
+    <section class="card" data-section="5">
+      <h2><span class="card-num">05</span> Servicios externos <span class="optional">(opcional)</span></h2>
+      <div id="listaServicios" class="repeat-list"></div>
+      <button type="button" class="btn-add" id="btnAddServicio">+ Agregar servicio</button>
+    </section>
+
+    <!-- 6. MANO DE OBRA -->
+    <section class="card" data-section="6">
+      <h2><span class="card-num">06</span> Mano de obra</h2>
+      <div id="listaManoObra" class="labor-list"></div>
+    </section>
+
+    <!-- 7. TRANSPORTE -->
+    <section class="card" data-section="7">
+      <h2><span class="card-num">07</span> Transporte</h2>
+      <div class="grid-3">
+        <label>Km totales (por viaje)
+          <input type="number" id="transKm" min="0" step="1" value="0">
+        </label>
+        <label>Número de viajes
+          <input type="number" id="transViajes" min="0" step="1" value="1">
+        </label>
+        <label>Costo por km (MXN)
+          <input type="number" id="transCostoKm" min="0" step="0.5">
+        </label>
+        <label>Costo fijo por viaje (MXN)
+          <input type="number" id="transCostoFijo" min="0" step="1">
+        </label>
+        <label>Casetas (MXN)
+          <input type="number" id="transCasetas" min="0" step="1" value="0">
+        </label>
+        <label>Estacionamiento (MXN)
+          <input type="number" id="transEstacionamiento" min="0" step="1" value="0">
+        </label>
+      </div>
+    </section>
+
+    <!-- 8. INSTALACIÓN -->
+    <section class="card" data-section="8">
+      <h2><span class="card-num">08</span> Instalación</h2>
+      <div class="grid-3">
+        <label># de instaladores
+          <input type="number" id="instNum" min="0" step="1" value="1">
+        </label>
+        <label>Horas estimadas
+          <input type="number" id="instHoras" min="0" step="0.5" value="0">
+        </label>
+        <label>Tarifa por hora (MXN)
+          <input type="number" id="instTarifa" min="0" step="1">
+        </label>
+        <label>Complejidad
+          <select id="instComplejidad">
+            <option value="baja">Baja</option>
+            <option value="media" selected>Media</option>
+            <option value="alta">Alta</option>
+          </select>
+        </label>
+      </div>
+      <label>Notas de acceso <span class="optional">(referencia, no afecta el cálculo)</span>
+        <textarea id="instNotas" rows="2" placeholder="Escaleras, muros, retiro de mueble existente…"></textarea>
+      </label>
+    </section>
+
+    <!-- 9. AJUSTES FINALES -->
+    <section class="card" data-section="9">
+      <h2><span class="card-num">09</span> Ajustes de precio <span class="optional">(opcional)</span></h2>
+      <div class="grid-3">
+        <label>Margen deseado (%)
+          <input type="number" id="margenOverride" min="0" max="90" step="1" placeholder="usa el default">
+        </label>
+        <label>% imprevistos manual
+          <input type="number" id="imprevistosOverride" min="0" step="1" placeholder="usa el sugerido">
+        </label>
+        <label>Ajuste por valor (%)
+          <input type="number" id="ajusteValor" min="0" step="1" value="0">
+        </label>
+      </div>
+    </section>
+
+  </form>
+
+  <aside class="panel-result" id="panelResultado">
+    <div class="result-plate">
+      <div class="plate-header">
+        <span class="plate-label">Estimación preliminar</span>
+        <span class="confianza-badge" id="confianzaBadge">—</span>
+      </div>
+
+      <div class="plate-range">
+        <div class="range-item">
+          <span class="range-label">Mínimo</span>
+          <span class="range-value" id="precioMinimo">$0</span>
+        </div>
+        <div class="range-item range-item--main">
+          <span class="range-label">Recomendado</span>
+          <span class="range-value" id="precioRecomendado">$0</span>
+        </div>
+        <div class="range-item">
+          <span class="range-label">Máximo</span>
+          <span class="range-value" id="precioMaximo">$0</span>
+        </div>
+      </div>
+
+      <p class="confianza-detalle" id="confianzaDetalle"></p>
+    </div>
+
+    <div class="desglose">
+      <h3>Desglose interno</h3>
+      <dl id="desgloseLista"></dl>
+    </div>
+
+    <div class="acciones">
+      <button type="button" id="btnCopiarCliente" class="btn-primary">Copiar vista cliente (WhatsApp)</button>
+      <button type="button" id="btnCopiarInterno" class="btn-secondary">Copiar desglose completo</button>
+    </div>
+
+    <p class="disclaimer">Esta es una estimación preliminar. No se guarda ningún dato al salir o recargar la página.</p>
+  </aside>
+
+</main>
+
+<script src="calc.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
